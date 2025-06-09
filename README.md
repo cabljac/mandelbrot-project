@@ -6,3 +6,9 @@ This is just a quick toy package to dust off some Go :)
 
 
 ![Mandelbrot Set](./mandelbrot.png)
+
+
+## TODO:
+
+- benchmark
+- goroutine it
