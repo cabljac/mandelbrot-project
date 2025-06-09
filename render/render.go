@@ -12,27 +12,23 @@ import (
 
 // Generate a Mandelbrot image
 func GenerateImage(width, height int) *image.RGBA {
-	// 1. Create blank image
 	img := image.NewRGBA(image.Rect(0, 0, width, height))
 
-	// 2. Create viewport and mandelbrot config
-	viewport := coords.NewViewport(width, height) // Use constructor
-	cfg := mandelbrot.NewConfig()                 // Use constructor
+	viewport := coords.NewViewport(width, height)
+	cfg := mandelbrot.NewConfig()
 
 	for x := 0; x < width; x++ {
 		for y := 0; y < height; y++ {
-			// z := coords.Point{Real: float64(x), Imag: float64(y)}.Complex()
-			point := viewport.PixelToComplex(x, y) // This returns coords.Point
-			c := point.Complex()                   // Convert to complex128
-			escaped, _ := cfg.Calculate(c)         // Calculate with complex128
+			point := viewport.PixelToComplex(x, y)
+			c := point.Complex()
+			escaped, iterations := cfg.Calculate(c)
 
 			var pixelColor color.RGBA
 			if !escaped {
-				// Point is in the set - black
 				pixelColor = color.RGBA{0, 0, 0, 255}
 			} else {
-				// Point escaped - white (for now)
-				pixelColor = color.RGBA{255, 255, 255, 255}
+				intensity := uint8((iterations * 255) / cfg.MaxIterations)
+				pixelColor = color.RGBA{intensity, intensity, intensity, 255}
 			}
 
 			img.Set(x, y, pixelColor)

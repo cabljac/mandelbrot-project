@@ -110,13 +110,11 @@ func TestIterateUntilEscape(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			escaped, iterations := iterateUntilEscape(tt.z, tt.c, tt.maxIterations)
 
-			// Check iteration count
 			if iterations != tt.expectedIter {
 				t.Errorf("iterateUntilEscape(%v, %v, %d) iterations = %d; want %d",
 					tt.z, tt.c, tt.maxIterations, iterations, tt.expectedIter)
 			}
 
-			// Check if escape status matches expectation
 			if escaped != tt.shouldEscape {
 				t.Errorf("iterateUntilEscape(%v, %v, %d) escaped = %t; want %t",
 					tt.z, tt.c, tt.maxIterations, escaped, tt.shouldEscape)
@@ -148,7 +146,6 @@ func TestConfigCalculate(t *testing.T) {
 				t.Errorf("Calculate(%v) escaped = %t; want %t", tt.c, escaped, tt.shouldEscape)
 			}
 
-			// Iterations should be reasonable
 			if iterations < 0 || iterations > config.MaxIterations {
 				t.Errorf("Calculate(%v) iterations = %d; should be between 0 and %d",
 					tt.c, iterations, config.MaxIterations)
