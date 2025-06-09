@@ -1,3 +1,3 @@
-module github.com/cabljac/mandelbrot-app
+module github.com/cabljac/mandelbrot-project
 
 go 1.22.5

@@ -10,7 +10,11 @@ import (
 func main() {
 	fmt.Println("Generating Mandelbrot image...")
 
-	img := render.GenerateImage(800, 600)
+	// TODO: at the moment going too big breaks something and results in a corrupted image
+
+	size := 16364
+
+	img := render.GenerateImageWithWorkerPool(size, size)
 
 	err := render.SavePNG(img, "mandelbrot.png")
 	if err != nil {
