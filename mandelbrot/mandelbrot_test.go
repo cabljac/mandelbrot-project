@@ -20,14 +20,12 @@ func TestMandelbrotIterationSimple(t *testing.T) {
 	tolerance := 1e-10
 
 	if cmplx.Abs(result-expected) > tolerance {
-		t.Errorf("Abs(3+4i) = %f; want %f", result, expected)
+		t.Errorf("mandelbrotIteration(1i, 1) = %v; want %v", result, expected)
 	}
 }
 
 func TestMandelbrotIterationRandom(t *testing.T) {
-
-	for _ = range 1000 {
-
+	for i := 0; i < 1000; i++ {
 		z, c := randomComplexNumber(t), randomComplexNumber(t)
 
 		result := mandelbrotIteration(z, c)
@@ -35,10 +33,9 @@ func TestMandelbrotIterationRandom(t *testing.T) {
 		tolerance := 1e-10
 
 		if cmplx.Abs(result-expected) > tolerance {
-			t.Errorf("Abs(z) = %f; want %f", result, expected)
+			t.Errorf("mandelbrotIteration(%v, %v) = %v; want %v", z, c, result, expected)
 		}
 	}
-
 }
 
 func TestHasEscaped(t *testing.T) {
@@ -86,7 +83,7 @@ func TestIterateUntilEscape(t *testing.T) {
 		{
 			name:          "escapes quickly",
 			z:             0 + 0i,
-			c:             1.9 + 0i, // Will escape fast
+			c:             2.1 + 0i, // Will escape fast
 			maxIterations: 100,
 			expectedIter:  1, // Should escape after first iteration
 			shouldEscape:  true,
@@ -111,7 +108,7 @@ func TestIterateUntilEscape(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			finalZ, iterations := iterateUntilEscape(tt.z, tt.c, tt.maxIterations)
+			escaped, iterations := iterateUntilEscape(tt.z, tt.c, tt.maxIterations)
 
 			// Check iteration count
 			if iterations != tt.expectedIter {
@@ -119,17 +116,42 @@ func TestIterateUntilEscape(t *testing.T) {
 					tt.z, tt.c, tt.maxIterations, iterations, tt.expectedIter)
 			}
 
-			// Check if final state matches expectation
-			escaped := hasEscaped(finalZ)
+			// Check if escape status matches expectation
 			if escaped != tt.shouldEscape {
 				t.Errorf("iterateUntilEscape(%v, %v, %d) escaped = %t; want %t",
 					tt.z, tt.c, tt.maxIterations, escaped, tt.shouldEscape)
 			}
+		})
+	}
+}
 
-			// For escaped cases, verify it actually escaped
-			if tt.shouldEscape && !hasEscaped(finalZ) {
-				t.Errorf("iterateUntilEscape(%v, %v, %d) should have escaped but finalZ = %v",
-					tt.z, tt.c, tt.maxIterations, finalZ)
+// Test the Config.Calculate method
+func TestConfigCalculate(t *testing.T) {
+	config := NewConfig()
+
+	tests := []struct {
+		name         string
+		c            complex128
+		shouldEscape bool
+	}{
+		{"origin - in set", 0 + 0i, false},
+		{"point in set", 0.25 + 0i, false},
+		{"point outside set", 2 + 0i, true},
+		{"far outside", 10 + 0i, true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			escaped, iterations := config.Calculate(tt.c)
+
+			if escaped != tt.shouldEscape {
+				t.Errorf("Calculate(%v) escaped = %t; want %t", tt.c, escaped, tt.shouldEscape)
+			}
+
+			// Iterations should be reasonable
+			if iterations < 0 || iterations > config.MaxIterations {
+				t.Errorf("Calculate(%v) iterations = %d; should be between 0 and %d",
+					tt.c, iterations, config.MaxIterations)
 			}
 		})
 	}
